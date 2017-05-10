@@ -1,13 +1,9 @@
 /**
+ * 虚拟Dom
  * Created by xiyuan on 17-5-9.
  */
-(function (vdom) {
-    if (typeof define === "function" && define.cmd) {
-        define(vdom)
-    } else {
-        this.vdom = vdom();
-    }
-})(function () {
+
+(function (exports) {
 
     //钩子类型
     var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
@@ -448,7 +444,7 @@
                 oldVnode = emptyNodeAt(oldVnode);
             }
 
-            if(vnode instanceof Array){
+            if (vnode instanceof Array) {
 
                 elm = oldVnode.elm;
                 parent = api.parentNode(elm);
@@ -466,12 +462,12 @@
                     removeVnodes(parent, [oldVnode], 0, 0);
                 }
 
-            }else{
-                if(!(vnode instanceof Object))return oldVnode;
+            } else {
+                if (!(vnode instanceof Object))return oldVnode;
 
                 //检查并转换dom元素为虚拟Dom
-                if(!isVnode(vnode)){
-                    vnode=emptyNodeAt(vnode);
+                if (!isVnode(vnode)) {
+                    vnode = emptyNodeAt(vnode);
                 }
 
                 //触发model中pre钩子
@@ -531,7 +527,8 @@
             booleanAttrsDict[booleanAttrs[i]] = true;
         }
         function updateAttrs(oldVnode, vnode) {
-            var key, cur, old, elm = vnode.elm, oldAttrs = oldVnode.data.attrs, attrs = vnode.data.attrs, namespaceSplit;
+            var key, cur, old, elm = vnode.elm, oldAttrs = oldVnode.data.attrs, attrs = vnode.data.attrs,
+                namespaceSplit;
             if (!oldAttrs && !attrs)
                 return;
             if (oldAttrs === attrs)
@@ -563,7 +560,8 @@
                 }
             }
         }
-        return { create: updateAttrs, update: updateAttrs };
+
+        return {create: updateAttrs, update: updateAttrs};
     }
 
     /**
@@ -774,7 +772,8 @@
         }
 
         function updateEventListeners(oldVnode, vnode) {
-            var oldOn = oldVnode.data.on, oldListener = oldVnode.listener, oldElm = oldVnode.elm, on = vnode && vnode.data.on, elm = (vnode && vnode.elm), name;
+            var oldOn = oldVnode.data.on, oldListener = oldVnode.listener, oldElm = oldVnode.elm,
+                on = vnode && vnode.data.on, elm = (vnode && vnode.elm), name;
             // optimization for reused immutable handlers
             if (oldOn === on) {
                 return;
@@ -828,9 +827,17 @@
         };
     }
 
-    return {
-        patch: init([attributesModule(),classModule(),propsModule(),styleModule(),eventListenersModule()]),
+    var vdom = {
+        patch: init([attributesModule(), classModule(), propsModule(), styleModule(), eventListenersModule()]),
         vnode: vnode,
         isVnode: isVnode
+    };
+
+    if (typeof define === "function") {
+        define(function (require, exports, module) {
+            module.exports = vdom;
+        })
+    } else {
+        exports.vdom = vdom;
     }
-})
+})(this)
