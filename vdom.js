@@ -833,7 +833,9 @@
         isVnode: isVnode
     };
 
-    if (typeof define === "function") {
+    if(typeof module === "object" && typeof module.exports === "object" ){
+        module.exports = vdom;
+    }else if (typeof define === "function") {
         define(function (require, exports, module) {
             module.exports = vdom;
         })
